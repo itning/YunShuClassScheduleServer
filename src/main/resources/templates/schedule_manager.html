@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="人力资源管理系统"/>
+    <meta name="keywords" content="人力资源管理系统"/>
+    <meta name="author" content="ITNING.TOP"/>
+    <title>云舒课表</title>
+    <!--mdui css-->
+    <link th:href="@{/lib/mdui/css/mdui.min.css}" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body class="mdui-drawer-body-left mdui-appbar-with-toolbar mdui-theme-primary-indigo mdui-theme-accent-pink">
+<header th:replace="common :: header"></header>
+<nav th:replace="common :: nav"></nav>
+<section class="mdui-container">
+    <div class="mdui-table-fluid">
+        <table class="mdui-table mdui-table-hoverable">
+            <thead>
+            <tr>
+                <th></th>
+                <th>星期一</th>
+                <th>星期二</th>
+                <th>星期三</th>
+                <th>星期四</th>
+                <th>星期五</th>
+                <th>星期六</th>
+                <th>星期日</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td id="1">1</td>
+                <td class="schedule" id="1-1"></td>
+                <td class="schedule" id="1-2"></td>
+                <td class="schedule" id="1-3"></td>
+                <td class="schedule" id="1-4"></td>
+                <td class="schedule" id="1-5"></td>
+                <td class="schedule" id="1-6"></td>
+                <td class="schedule" id="1-7"></td>
+            </tr>
+            <tr>
+                <td id="2">2</td>
+                <td class="schedule" id="2-1"></td>
+                <td class="schedule" id="2-2"></td>
+                <td class="schedule" id="2-3"></td>
+                <td class="schedule" id="2-4"></td>
+                <td class="schedule" id="2-5"></td>
+                <td class="schedule" id="2-6"></td>
+                <td class="schedule" id="2-7"></td>
+            </tr>
+            <tr>
+                <td id="3">3</td>
+                <td class="schedule" id="3-1"></td>
+                <td class="schedule" id="3-2"></td>
+                <td class="schedule" id="3-3"></td>
+                <td class="schedule" id="3-4"></td>
+                <td class="schedule" id="3-5"></td>
+                <td class="schedule" id="3-6"></td>
+                <td class="schedule" id="3-7"></td>
+            </tr>
+            <tr>
+                <td id="4">4</td>
+                <td class="schedule" id="4-1"></td>
+                <td class="schedule" id="4-2"></td>
+                <td class="schedule" id="4-3"></td>
+                <td class="schedule" id="4-4"></td>
+                <td class="schedule" id="4-5"></td>
+                <td class="schedule" id="4-6"></td>
+                <td class="schedule" id="4-7"></td>
+            </tr>
+            <tr>
+                <td id="5">5</td>
+                <td class="schedule" id="5-1"></td>
+                <td class="schedule" id="5-2"></td>
+                <td class="schedule" id="5-3"></td>
+                <td class="schedule" id="5-4"></td>
+                <td class="schedule" id="5-5"></td>
+                <td class="schedule" id="5-6"></td>
+                <td class="schedule" id="5-7"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <button id="add" class="mdui-fab mdui-fab-fixed mdui-ripple mdui-color-theme-accent"><i
+            class="mdui-icon material-icons">add</i></button>
+    <div class="mdui-dialog" id="modal">
+        <div style="padding: 20px">
+            <div class="mdui-textfield">
+                <label class="mdui-textfield-label">请输入:课程@地点@教师</label>
+                <input id="name" class="mdui-textfield-input" type="text"/>
+            </div>
+            <button class="mdui-btn mdui-btn-raised mdui-ripple mdui-color-theme-accent" mdui-dialog-confirm>
+                修改
+            </button>
+            <button onclick="window.location.reload()"
+                    class="mdui-btn mdui-btn-raised mdui-ripple mdui-color-theme-accent">取消
+            </button>
+        </div>
+    </div>
+</section>
+<script th:src="@{/lib/jquery/jquery.min.js}"></script>
+<script th:src="@{/lib/mdui/js/mdui.min.js}"></script>
+<script th:inline="javascript">
+    'use strict';
+    let scheduleList = [[${scheduleList}]];
+    let classId = [[${classid}]];
+    $(function () {
+        for (let i = 0; i < scheduleList.length; i++) {
+            let schedule = scheduleList[i];
+            let $it = $('#' + schedule.section + "-" + schedule.week);
+            $it.data("id", schedule.id);
+            $it.data("index", i);
+            $it.text(schedule.name);
+        }
+        $('.schedule').click(function () {
+            if (classId === -1) {
+                return;
+            }
+            let s = $(this).attr("id").split("-");
+            let id = $(this).data('id');
+            let index = $(this).data('index');
+            console.log("id:" + id);
+            console.log("week:" + s[1]);
+            console.log("section:" + s[0]);
+            if (id === undefined) {
+                mdui.prompt('请输入:课程@地点@教师', '新增',
+                    function (value) {
+                        if (value !== "") {
+                            $.post("/server/schedule/add", {
+                                'name': value,
+                                'section': s[0],
+                                'week': s[1],
+                                'classId': classId
+                            }, function (data) {
+                                if (data === 200) {
+                                    window.location.reload();
+                                } else {
+                                    mdui.snackbar({
+                                        message: data
+                                    });
+                                }
+                            })
+                        } else {
+                            mdui.snackbar({
+                                message: '什么也没输入'
+                            });
+                        }
+                    },
+                    function (value) {
+                        //do nothing
+                    }
+                );
+            } else {
+                let classSchedule = scheduleList[index];
+                let $name = $('#name');
+                $name.val(classSchedule.name + '@' + classSchedule.location + "@" + classSchedule.teacher);
+                new mdui.Dialog("#modal", {history: false}).open();
+                document.getElementById("modal").addEventListener('confirm.mdui.dialog', function () {
+                    $.post("/server/schedule/delAndModify", {'name': $name.val(), 'id': classSchedule.id}, function (data) {
+                        if (data === 200) {
+                            window.location.reload();
+                        } else {
+                            mdui.snackbar({
+                                message: data
+                            });
+                        }
+                    })
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>

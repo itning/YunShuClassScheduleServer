@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="人力资源管理系统"/>
+    <meta name="keywords" content="人力资源管理系统"/>
+    <meta name="author" content="ITNING.TOP"/>
+    <title>云舒课表</title>
+    <!--mdui css-->
+    <link th:href="@{/lib/mdui/css/mdui.min.css}" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body class="mdui-drawer-body-left mdui-appbar-with-toolbar mdui-theme-primary-indigo mdui-theme-accent-pink">
+<header th:replace="common :: header"></header>
+<nav th:replace="common :: nav"></nav>
+<section class="mdui-container">
+    <form th:action="@{/server/file}" method="post" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <input type="submit" value="开始上传">
+    </form>
+</section>
+<script th:src="@{/lib/mdui/js/mdui.min.js}"></script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="人力资源管理系统"/>
+    <meta name="keywords" content="人力资源管理系统"/>
+    <meta name="author" content="ITNING.TOP"/>
+    <title>云舒课表</title>
+    <!--mdui css-->
+    <link th:href="@{/lib/mdui/css/mdui.min.css}" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body class="mdui-drawer-body-left mdui-appbar-with-toolbar mdui-theme-primary-indigo mdui-theme-accent-pink">
+<header th:replace="common :: header"></header>
+<nav th:replace="common :: nav"></nav>
+<section class="mdui-container">
+    <div class="mdui-table-fluid">
+        <table class="mdui-table mdui-table-hoverable">
+            <thead>
+            <tr>
+                <th>班级名称</th>
+                <th>版本编号</th>
+                <th>所属专业</th>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="clazz : ${classList}">
+                <td><a th:href="${'schedule?id='+clazz.id}" th:text="${clazz.name}"></a></td>
+                <td th:text="${clazz.version}">版本</td>
+                <td th:text="${clazz.profession.name}">专业名</td>
+                <td>
+                    <button class="mdui-btn mdui-ripple" th:data-version="${clazz.version}" th:data-id="${clazz.id}"
+                            th:data-name="${clazz.name}"
+                            onclick="modify(this)">修改
+                    </button>
+                </td>
+                <td>
+                    <button class="mdui-btn mdui-ripple" th:data-id="${clazz.id}" onclick="del(this)">删除</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <button th:data-professionid="${professionId}" id="add"
+            class="mdui-fab mdui-fab-fixed mdui-ripple mdui-color-theme-accent"><i
+            class="mdui-icon material-icons">add</i></button>
+    <div class="mdui-dialog" id="modal">
+        <div style="padding: 20px">
+            <div class="mdui-textfield">
+                <label class="mdui-textfield-label">名称</label>
+                <input id="name" class="mdui-textfield-input" type="text"/>
+            </div>
+            <div class="mdui-textfield">
+                <label class="mdui-textfield-label">版本</label>
+                <input id="version" class="mdui-textfield-input" type="text"/>
+            </div>
+            <button class="mdui-btn mdui-btn-raised mdui-ripple mdui-color-theme-accent" mdui-dialog-confirm>修改</button>
+            <button onclick="window.location.reload()"
+                    class="mdui-btn mdui-btn-raised mdui-ripple mdui-color-theme-accent">取消
+            </button>
+        </div>
+    </div>
+</section>
+<script th:src="@{/lib/jquery/jquery.min.js}"></script>
+<script th:src="@{/lib/mdui/js/mdui.min.js}"></script>
+<script>
+    'use strict';
+    $(function () {
+        $('#add').click(function () {
+            let professionId = $(this).data("professionid");
+            if (professionId === -1) {
+                return;
+            }
+            console.log(professionId);
+            mdui.prompt('请输入班级名称', '新增班级',
+                function (value) {
+                    if (value !== "") {
+                        $.post("/server/class/add", {'name': value, 'professionId': professionId}, function (data) {
+                            if (data === 200) {
+                                window.location.reload();
+                            } else {
+                                mdui.snackbar({
+                                    message: data
+                                });
+                            }
+                        })
+                    } else {
+                        mdui.snackbar({
+                            message: '什么也没输入'
+                        });
+                    }
+                },
+                function (value) {
+                    //do nothing
+                }
+            );
+        });
+    });
+
+    function del(that) {
+        let id = $(that).data('id');
+        mdui.confirm('确认删除ID为' + id + '的专业', '删除确认',
+            function () {
+                $.post("/server/class/del", {'id': id}, function (data) {
+                    if (data === 200) {
+                        window.location.reload();
+                    } else {
+                        mdui.snackbar({
+                            message: data
+                        });
+                    }
+                });
+            },
+            function () {
+                //do nothing
+            }
+        );
+    }
+
+    function modify(that) {
+        let id = $(that).data('id');
+        let name = $(that).data('name');
+        let version = $(that).data('version');
+        let $name = $('#name');
+        $name.val(name);
+        let $version = $('#version');
+        $version.val(version);
+        new mdui.Dialog("#modal", {history: false}).open();
+        document.getElementById("modal").addEventListener('confirm.mdui.dialog', function () {
+            doModify(id, $name.val(), $version.val());
+        })
+
+    }
+
+    function doModify(id, name, version) {
+        $.post("/server/class/modify", {'id': id, 'name': name, 'version': version}, function (data) {
+            if (data === 200) {
+                window.location.reload();
+            } else {
+                mdui.snackbar({
+                    message: data
+                });
+            }
+        });
+    }
+</script>
+</body>
+</html>

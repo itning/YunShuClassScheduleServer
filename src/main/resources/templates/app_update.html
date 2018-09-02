@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="人力资源管理系统"/>
+    <meta name="keywords" content="人力资源管理系统"/>
+    <meta name="author" content="ITNING.TOP"/>
+    <title>云舒课表</title>
+    <!--mdui css-->
+    <link th:href="@{/lib/mdui/css/mdui.min.css}" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body class="mdui-drawer-body-left mdui-appbar-with-toolbar mdui-theme-primary-indigo mdui-theme-accent-pink">
+<header th:replace="common :: header"></header>
+<nav th:replace="common :: nav"></nav>
+<section class="mdui-container">
+    <form action="/server/update" method="post">
+        <div class="mdui-textfield">
+            <label class="mdui-textfield-label">版本号</label>
+            <input name="versionCode" class="mdui-textfield-input" type="number" th:value="${appUpdate.versionCode}"/>
+        </div>
+        <div class="mdui-textfield">
+            <label class="mdui-textfield-label">版本名</label>
+            <input name="versionName" class="mdui-textfield-input" type="text" th:value="${appUpdate.versionName}"/>
+        </div>
+        <div class="mdui-textfield">
+            <label class="mdui-textfield-label">描述</label>
+            <input name="versionDesc" class="mdui-textfield-input" type="text" th:value="${appUpdate.versionDesc}"/>
+        </div>
+        <div class="mdui-textfield">
+            <label class="mdui-textfield-label">下载地址</label>
+            <input name="downloadUrl" class="mdui-textfield-input" type="url" th:value="${appUpdate.downloadUrl}"/>
+        </div>
+        <button type="submit" class="mdui-fab mdui-fab-fixed mdui-ripple mdui-color-theme-accent"><i
+                class="mdui-icon material-icons">add</i>
+        </button>
+    </form>
+</section>
+<script th:src="@{/lib/mdui/js/mdui.min.js}"></script>
+</body>
+</html>

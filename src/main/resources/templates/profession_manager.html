@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="人力资源管理系统"/>
+    <meta name="keywords" content="人力资源管理系统"/>
+    <meta name="author" content="ITNING.TOP"/>
+    <title>云舒课表</title>
+    <!--mdui css-->
+    <link th:href="@{/lib/mdui/css/mdui.min.css}" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body class="mdui-drawer-body-left mdui-appbar-with-toolbar mdui-theme-primary-indigo mdui-theme-accent-pink">
+<header th:replace="common :: header"></header>
+<nav th:replace="common :: nav"></nav>
+<section class="mdui-container">
+    <div class="mdui-table-fluid">
+        <table class="mdui-table mdui-table-hoverable">
+            <thead>
+            <tr>
+                <th>专业名称</th>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="profession : ${professionList}">
+                <td><a th:href="${'/server/class?id='+profession.id}" th:text="${profession.name}"></a></td>
+                <td>
+                    <button class="mdui-btn mdui-ripple" th:data-id="${profession.id}" th:data-name="${profession.name}"
+                            onclick="modify(this)">修改
+                    </button>
+                </td>
+                <td>
+                    <button class="mdui-btn mdui-ripple" th:data-id="${profession.id}" onclick="del(this)">删除</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <button id="add" class="mdui-fab mdui-fab-fixed mdui-ripple mdui-color-theme-accent"><i
+            class="mdui-icon material-icons">add</i></button>
+</section>
+<script th:src="@{/lib/jquery/jquery.min.js}"></script>
+<script th:src="@{/lib/mdui/js/mdui.min.js}"></script>
+<script>
+    'use strict';
+    $(function () {
+        $('#add').click(function () {
+            mdui.prompt('请输入专业名称', '新增专业',
+                function (value) {
+                    if (value !== "") {
+                        $.post("/server/profession/add", {'name': value}, function (data) {
+                            if (data === 200) {
+                                window.location.reload();
+                            } else {
+                                mdui.snackbar({
+                                    message: data
+                                });
+                            }
+                        })
+                    } else {
+                        mdui.snackbar({
+                            message: '什么也没输入'
+                        });
+                    }
+                },
+                function (value) {
+                    //do nothing
+                }
+            );
+        });
+    });
+
+    function del(that) {
+        let id = $(that).data('id');
+        mdui.confirm('确认删除ID为' + id + '的专业', '删除确认',
+            function () {
+                $.post("/server/profession/del", {'id': id}, function (data) {
+                    if (data === 200) {
+                        window.location.reload();
+                    } else {
+                        mdui.snackbar({
+                            message: data
+                        });
+                    }
+                });
+            },
+            function () {
+                //do nothing
+            }
+        );
+    }
+
+    function modify(that) {
+        let id = $(that).data('id');
+        let name = $(that).data('name');
+        mdui.prompt('原专业名:' + name, '修改专业',
+            function (value) {
+                if (value !== "" && value !== name) {
+                    $.post("/server/profession/modify", {'name': value, 'id': id}, function (data) {
+                        if (data === 200) {
+                            window.location.reload();
+                        } else {
+                            mdui.snackbar({
+                                message: data
+                            });
+                        }
+                    });
+                }
+            },
+            function (value) {
+                //do nothing
+            }
+        );
+    }
+</script>
+</body>
+</html>
